@@ -6,7 +6,7 @@
 
 #include <OctoWS2811.h> 
 // Begin configuration
-#define DURATION 800 //time to make a full scan
+#define DURATION 750 //time to make a full scan
 #define STRIPLENGTH  9
 #define SPREAD  2 //the "fade"
 int colorTable[3] = {0xff0000, 0x110000,0x030000}; 
@@ -38,7 +38,7 @@ void loop() {
   for( i = 0; i < STRIPLENGTH -1  ; i++) {
     setFrame( i );
   }
-  for (i = STRIPLENGTH - 1 ;i > 0; i--) { // -2 to not repeat frames
+  for (i = STRIPLENGTH - 1 ;i > 0; i--) {
    setFrame(i); 
   }
 }
