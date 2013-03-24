@@ -16,6 +16,7 @@ is for the "main" pixel and it is required. If you have a "spread" value, add
 as many values defining the colors you want. These colors will be applied to both
 sides of the fading. Try it out!
 */
+
 // End configuration
 
 int pause = DURATION / STRIPLENGTH;
