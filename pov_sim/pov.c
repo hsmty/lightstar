@@ -12,7 +12,7 @@
  
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <math.h> 
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <SDL/SDL.h>
@@ -22,21 +22,15 @@
 #define SCREEN_HEIGHT 480
 #define SCREEN_BPP     16
 
-/* Set up some booleans */
+/* Define our booleans */
 #define TRUE  1
 #define FALSE 0
 
 /* This is our SDL surface */
 SDL_Surface *surface;
 
-GLfloat zoom = -60.0f; /* Viewing Distance Away From Stars */
-GLfloat tilt = 0.0f;  /* Tilt The View */
-
-GLuint loop;           /* General Loop Variable */
-GLuint texture[1];     /* Storage For One Texture */
-
-float x[40]={0};
-float y[40]={0};
+float x[100]={0};
+float y[100]={0};
 float spin = 0;
 
 /* function to release/destroy our resources and restoring the old desktop */
@@ -49,53 +43,12 @@ void Quit( int returnCode )
     exit( returnCode );
 }
 
-/* function to load in bitmap as a GL texture */
-int LoadGLTextures( )
-{
-    /* Status indicator */
-    int Status = FALSE;
-
-    /* Create storage space for the texture */
-    SDL_Surface *TextureImage[1]; 
-
-    /* Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit */
-    if ( ( TextureImage[0] = SDL_LoadBMP( "data/star.bmp" ) ) )
-        {
-
-	    /* Set the status to true */
-	    Status = TRUE;
-
-	    /* Create The Texture */
-	    glGenTextures( 1, &texture[0] );
-
-	    /* Load in texture */
-	    /* Typical Texture Generation Using Data From The Bitmap */
-	    glBindTexture( GL_TEXTURE_2D, texture[0] );
-
-	    /* Linear Filtering */
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-	    /* Generate The Texture */
-	    glTexImage2D( GL_TEXTURE_2D, 0, 3, TextureImage[0]->w,
-			  TextureImage[0]->h, 0, GL_BGR,
-			  GL_UNSIGNED_BYTE, TextureImage[0]->pixels );
-
-        }
-
-    /* Free up any memory we may have used */
-    if ( TextureImage[0] )
-	    SDL_FreeSurface( TextureImage[0] );
-
-    return Status;
-}
-
 /* function to reset our viewport after a window resize */
 int resizeWindow( int width, int height )
 {
     /* Height / width ration */
     GLfloat ratio;
- 
+
     /* Protect against a divide by zero */
     if ( height == 0 )
 	height = 1;
@@ -103,7 +56,7 @@ int resizeWindow( int width, int height )
     ratio = ( GLfloat )width / ( GLfloat )height;
 
     /* Setup our viewport. */
-    glViewport( 0, 0, ( GLint )width, ( GLint )height );
+    glViewport( 0, 0, ( GLsizei )width, ( GLsizei )height );
 
     /* change to the projection matrix and set our viewing volume. */
     glMatrixMode( GL_PROJECTION );
@@ -136,30 +89,6 @@ void handleKeyPress( SDL_keysym *keysym )
 	     */
 	    SDL_WM_ToggleFullScreen( surface );
 	    break;
-	case SDLK_UP:
-	    /* Up arrow key was pressed
-	     * this changes the tilt of the stars
-	     */
-	    tilt -= 0.5f;
-	    break;
-	case SDLK_DOWN:
-	    /* Down arrow key was pressed
-	     * this changes the tilt of the stars
-	     */
-	    tilt += 0.5f;
-	    break;
-	case SDLK_PAGEUP:
-	    /* PageUp key was pressed
-	     * zoom into the scene
-	     */
-	    zoom -= 0.2f;
-	    break;
-	case SDLK_PAGEDOWN:
-	    /* PageDown key was pressed
-	     * zoom out of the scene
-	     */
-	    zoom += 0.2f;
-	    break;
 	default:
 	    break;
 	}
@@ -171,13 +100,6 @@ void handleKeyPress( SDL_keysym *keysym )
 int initGL( GLvoid )
 {
 
-    /* Load in the texture */
-    if ( !LoadGLTextures( ) )
-	return FALSE;
-
-    /* Enable Texture Mapping */
-    glEnable( GL_TEXTURE_2D );
-
     /* Enable smooth shading */
     glShadeModel( GL_SMOOTH );
 
@@ -187,28 +109,29 @@ int initGL( GLvoid )
     /* Depth buffer setup */
     glClearDepth( 1.0f );
 
+    /* Enables Depth Testing */
+    glEnable( GL_DEPTH_TEST );
+
+    /* The Type Of Depth Test To Do */
+    glDepthFunc( GL_LEQUAL );
+
     /* Really Nice Perspective Calculations */
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
-    /* Set The Blending Function For Translucency */
-    glBlendFunc( GL_SRC_ALPHA, GL_ONE );
+	  /* Get coords semicircle */
+    float pos = 0;
+    float radians = 0;
+    int radius = 1;
 
-    /* Enable Blending */
-    glEnable( GL_BLEND );
+    int i;
+    for ( i=0; i < 72; i++)
+    {
+            pos=i*5;
+            radians = (pos)*3.14159/180;
+            x[i]= cos(radians)*radius;
+            y[i]= sin(radians)*radius;
+    }
 
-    /* Get coords semicircle */
-	float pos = 0;
-	float radians = 0;
-	int radius = 1;
-
-	int i;
-	for ( i=0; i < 36; i++)
-	{
-			pos=i*5;
-			radians = (pos)*3.14159/180;
-			x[i]= cos(radians)*radius;
-			y[i]= sin(radians)*radius;  
-	}
 
     return( TRUE );
 }
@@ -219,40 +142,43 @@ int drawGLScene( GLvoid )
     /* These are to calculate our fps */
     static GLint T0     = 0;
     static GLint Frames = 0;
-
-	spin += 1.0f;
-
+	
+	spin += 60.0f;
+	
     /* Clear The Screen And The Depth Buffer */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-    /* Select Our Texture */
-    glBindTexture( GL_TEXTURE_2D, texture[0] );
-    glLoadIdentity( );
-
-    /* Zoom Into The Screen (Using The Value In 'zoom') */
-    glTranslatef( 0.0f, 0.0f, zoom );
-    
-    /* Assign A Color Using Bytes */
-    glColor4ub( 255, 0, 0, 255 );
-    
-    glRotatef( spin, 0.0f, 1.0f, 0.0f );	
-    int i;
-	for (i=0; i <= 36; i++)
-	{
-        glTranslatef( 0.0f, 0.0f , 0.0f );
-
-    	glBegin( GL_QUADS );
-     		glTexCoord2f( 0.0f, 0.0f ); glVertex3f( -1.0f, -1.0f, 0.0f );
-    		glTexCoord2f( 1.0f, 0.0f ); glVertex3f(  1.0f, -1.0f, 0.0f );
-    		glTexCoord2f( 1.0f, 1.0f ); glVertex3f(  1.0f,  1.0f, 0.0f );
-    		glTexCoord2f( 0.0f, 1.0f ); glVertex3f( -1.0f,  1.0f, 0.0f );   	
-		glEnd( );
-     
-    	glTranslatef( x[i], y[i], 0.0f );
-    }	
+    /* Move Left 1.5 Units And Into The Screen 6.0 */
+    glLoadIdentity();
+    glTranslatef( -1.5f, 0.0f, -6.0f );
+	
+	glRotatef( spin, 0.0f, 1.0f, 0.0f );
+	
+	glPointSize(3.0f);
+	int i;
+    for (i=0; i < 72; i++)
+    {	
+    	glBegin( GL_POINTS );             /* Drawing Using Triangles       */
+      		glColor3f(   1.0f,  0.0f,  0.0f ); /* Red                           */
+      		glVertex3f(  y[i],  x[i],  0.0f ); /* Top Of Triangle               */
+    	glEnd( );                            /* Finished Drawing The Triangle */
+	}
 
     /* Draw it to the screen */
     SDL_GL_SwapBuffers( );
+
+    /* Gather our frames per second 
+    Frames++;
+    {
+	GLint t = SDL_GetTicks();
+	if (t - T0 >= 5000) {
+	    GLfloat seconds = (t - T0) / 1000.0;
+	    GLfloat fps = Frames / seconds;
+	    printf("%d frames in %g seconds = %g FPS\n", Frames, seconds, fps);
+	    T0 = t;
+	    Frames = 0;
+	}
+    }*/
 
     return( TRUE );
 }
@@ -318,17 +244,8 @@ int main( int argc, char **argv )
 	    Quit( 1 );
 	}
 
-    /* Enable key repeat */
-    if ( ( SDL_EnableKeyRepeat( 100, SDL_DEFAULT_REPEAT_INTERVAL ) ) )
-	{
-	    fprintf( stderr, "Setting keyboard repeat failed: %s\n",
-		     SDL_GetError( ) );
-	    Quit( 1 );
-	}
-
     /* initialize OpenGL */
     initGL( );
-
 
     /* resize the initial window */
     resizeWindow( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -336,12 +253,22 @@ int main( int argc, char **argv )
     /* wait for events */
     while ( !done )
 	{
-	    /* handle the events in the queue */
+		 /* handle the events in the queue */
 
 	    while ( SDL_PollEvent( &event ) )
 		{
 		    switch( event.type )
 			{
+			case SDL_ACTIVEEVENT:
+			    /* Something's happend with our focus
+			     * If we lost focus or we are iconified, we
+			     * shouldn't draw the screen
+			     */
+			    if ( event.active.gain == 0 )
+				isActive = FALSE;
+			    else
+				isActive = TRUE;
+			    break;			    
 			case SDL_VIDEORESIZE:
 			    /* handle resize event */
 			    surface = SDL_SetVideoMode( event.resize.w,
@@ -367,6 +294,8 @@ int main( int argc, char **argv )
 			}
 		}
 
+	    /* draw the scene */
+	    if ( isActive )
 		drawGLScene( );
 	}
 
