@@ -18,8 +18,16 @@
 #define TRUE  1
 #define FALSE 0
 
+/* Number of points in the circumference */
+#define NPOINTS 100
+
 /* This is our SDL surface */
 SDL_Surface *surface;
+
+struct Point {
+	float x;
+	float y;
+};
 
 void Quit(int ret);
 int resizeWin(int width, int height);
@@ -107,25 +115,25 @@ initGL(GLvoid)
 int
 drawGLScene( GLvoid )
 {
-	/* Get coords semicircle */
 	float pos = 0, radians = 0;
-	int radius = 1, i = 0;
-	static int init = 0, x[100] = {0}, y[100] = {0};
+	int radius = 5, i = 0;
+	static int init = 0;
+	static struct Point *points;
 	static float spin = 0;
 
+	/* Get coords semicircle */
 	if (init == 0) {
 		init = 1;
-		for ( i=0; i < 100; i++) {
-			pos = i*5;
-			radians = (pos)*3.14159/180;
-			x[i] = cos(radians)*radius;
-			y[i] = sin(radians)*radius;
+		printf("Creating semicircle\n");
+		points = (struct Point*) malloc(NPOINTS * sizeof(struct Point));
+		for (i = 0; i < NPOINTS; i++) {
+			pos = i * 18;
+			radians = ((float) pos) * 3.14159/180;
+			points[i].x = cos(radians) * radius;
+			points[i].y = sin(radians) * radius;
 		}
 	}
 
-	
-	/* Starts to spin */
-	spin += 60.0f;
 	
 	/* Clear The Screen And The Depth Buffer */
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -134,14 +142,20 @@ drawGLScene( GLvoid )
 	glLoadIdentity();
 	glTranslatef(-1.5f, 0.0f, -20.0f);
 	
+	/* Starts to spin */ 
+	spin += 90.0f;
 	glRotatef(spin, 0.0f, 1.0f, 0.0f);
 	
 	glPointSize(3.0f);
-	for (i=0; i < 72; i++) {	
+	for (i = 0; i < 100; i++) {	
 		/* Drawing Using Triangles */
 		glBegin( GL_POINTS );
-      		glColor3f(   1.0f,  0.0f,  0.0f ); /* Red */
-		glVertex3f(  y[i],  x[i],  0.0f ); /* Top Of Triangle */
+		if (i % 2) {
+			glColor3f(1.0f,  0.0f,  0.0f ); /* Red */
+		} else {
+			glColor3f(0.0f,  0.0f,  1.0f ); /* Blue */
+		}
+		glVertex3f(points[i].y, points[i].x,  0.0f); /* Top Of Triangle */
 		/* Finished Drawing The Triangle */
 		glEnd();
 	}
