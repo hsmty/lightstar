@@ -2,6 +2,10 @@
  * Lightstar simulator
  */
 
+#ifndef _LOOP_HEADER_
+
+#define _LOOP_HEADER_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> 
@@ -23,3 +27,5 @@ struct Point {
 
 extern void Quit(int ret);
 extern int loop();
+
+#endif
