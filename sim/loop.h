@@ -15,9 +15,8 @@
 #else
 	#include <GL/gl.h>
 	#include <GL/glu.h>
+	#include <GL/glut.h>
 #endif
-
-#include <SDL.h>
 
 struct Color {
 	float r;
@@ -31,7 +30,6 @@ struct Point {
 	struct Color *color;
 };
 
-extern void Quit(int ret);
-extern int loop();
+void loop();
 
 #endif
