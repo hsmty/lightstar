@@ -24,9 +24,16 @@
 /* This is our SDL surface */
 SDL_Surface *surface;
 
+struct Color {
+	float r;
+	float g;
+	float b;
+};
+
 struct Point {
 	float x;
 	float y;
+	struct Color *color;
 };
 
 void Quit(int ret);
@@ -132,6 +139,10 @@ drawGLScene( GLvoid )
 			radians = ((float) pos) * 3.14159/180;
 			points[i].x = cos(radians) * radius;
 			points[i].y = sin(radians) * radius;
+			points[i].color = (struct Color*) malloc(sizeof(struct Color));
+			points[i].color->r = 1;
+			points[i].color->g = 0;
+			points[i].color->b = 0;
 		}
 	
 	}
@@ -151,13 +162,10 @@ drawGLScene( GLvoid )
 	glPointSize(3.0f);
 	for (i = 0; i < NPOINTS; i++) {	
 		/* Drawing Using Triangles */
+		struct Point p = points[i];
 		glBegin( GL_POINTS );
-		if (i % 2) {
-			glColor3f(1.0f,  0.0f,  0.0f ); /* Red */
-		} else {
-			glColor3f(0.0f,  0.0f,  1.0f ); /* Blue */
-		}
-		glVertex3f(points[i].y, points[i].x,  0.0f); /* Top Of Triangle */
+		glColor3f(p.color->r,  p.color->g,  p.color->b );
+		glVertex3f(p.y, p.x,  0.0f); /* Top Of Triangle */
 		/* Finished Drawing The Triangle */
 		glEnd();
 	}
