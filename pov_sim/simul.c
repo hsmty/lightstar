@@ -128,7 +128,7 @@ drawGLScene( GLvoid )
 		arc = 180.0f / NPOINTS; /* Size of the arc between points */
 		points = (struct Point*) malloc(NPOINTS * sizeof(struct Point));
 		for (i = 0; i < NPOINTS; i++) {
-			pos = (i + 1) * arc;
+			pos = i * arc;
 			radians = ((float) pos) * 3.14159/180;
 			points[i].x = cos(radians) * radius;
 			points[i].y = sin(radians) * radius;
@@ -163,7 +163,7 @@ drawGLScene( GLvoid )
 	}
 
 	/* Draw it to the screen */
-	SDL_GL_SwapBuffers( );
+	SDL_GL_SwapBuffers();
 
 	return TRUE;
 }
@@ -278,7 +278,7 @@ main( int argc, char **argv )
 		}
 
 		if (isActive) {
-		  drawGLScene();
+			drawGLScene();
 		}
 	}
 
