@@ -11,26 +11,20 @@ static struct Point *points;
 void 
 resizeWindow(int width, int height)
 {
-    GLfloat ratio;
+	GLfloat ratio;
 
-    if (height == 0){
-	height = 1;
-    }
+	/* Avoid division by zero */
+	if (height == 0){
+		height = 1;
+	}
 
-    ratio = (GLfloat) width / (GLfloat) height;
-
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-
-    glMatrixMode(GL_PROJECTION);
-    
+	ratio = (GLfloat) width / (GLfloat) height;
+	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-    gluPerspective(45.0f, ratio, 0.1f, 100.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-
-    glLoadIdentity();
-
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
 /* Here goes our drawing code */
@@ -112,6 +106,7 @@ loop()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	glutCreateWindow("Lightstar The Movie The Game X Turbo POV Simulation");
 	glutReshapeFunc(resizeWindow);
 	glutDisplayFunc(drawScene);	
