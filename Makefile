@@ -1,10 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
+Objects = simul
+SDLLIB := $(shell sdl-config --libs --cflags)
 
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
-	CFLAGS += -framework OpenGL -framework GLUT -I/opt/local/include/SDL/
-	SDLLIB = `sdl-config --libs`
+	CFLAGS += -framework OpenGL -framework GLUT
+	Objects += simul.dSYM
 else
 	GLLIBS = -lGL -lGLU -lglut
 endif
@@ -12,7 +14,7 @@ endif
 all: simul
 
 clean:
-	rm simul
+	rm -r $(Objects)
 
 simul: sim/simul.c sim/loop.c
 	$(CC) $(CFLAGS) -o simul sim/simul.c sim/loop.c $(GLLIBS)
