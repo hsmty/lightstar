@@ -8,5 +8,7 @@ int
 main( int argc, char **argv )
 {
 	int ret = loop();
+	/* Clean the buffers */
+	Quit(ret);
 	return ret;
 }

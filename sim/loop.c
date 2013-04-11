@@ -7,15 +7,15 @@
 /* This is our SDL surface */
 SDL_Surface *surface;
 
-void
+extern void
 Quit(int ret)
 {
     /* clean up the window */
-    SDL_Quit( );
+    SDL_Quit();
     exit(ret);
 }
 
-int
+static int
 resizeWin(int width, int height)
 {
     /* Height / width ratio */
@@ -46,7 +46,7 @@ resizeWin(int width, int height)
 }
 
 /* function to handle key press events */
-void
+static void
 handleKeyPress(SDL_keysym *key)
 {
 	switch (key->sym){
@@ -61,7 +61,7 @@ handleKeyPress(SDL_keysym *key)
 	}
 }
 
-int
+static int
 initGL(GLvoid)
 {
 
@@ -87,7 +87,7 @@ initGL(GLvoid)
 }
 
 /* Here goes our drawing code */
-int
+static int
 drawGLScene( GLvoid )
 {
 	float pos = 0, radians = 0;
@@ -144,7 +144,7 @@ drawGLScene( GLvoid )
 	return TRUE;
 }
 
-int
+extern int
 loop()
 {
 	/* Flags to pass to SDL_SetVideoMode */

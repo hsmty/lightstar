@@ -14,9 +14,5 @@ struct Point {
 	struct Color *color;
 };
 
-void Quit(int ret);
-int resizeWin(int width, int height);
-void handleKeyPress(SDL_keysym *key);
-int initGL(GLvoid);
-int drawGLScene(GLvoid);
-int loop();
+extern void Quit(int ret);
+extern int loop();
