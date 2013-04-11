@@ -88,38 +88,58 @@ initGL(GLvoid)
 }
 
 /* Here goes our drawing code */
-static int
-drawGLScene( GLvoid )
+static struct Point*
+createSemicircle(const int npoints, const int radius)
 {
-	float pos = 0, radians = 0;
-	int radius = 5, i = 0;
-	static int init = 0;
-	static struct Point *points;
-	static float spin = 0, arc = 0;
+	int i, pos = 0;
+	float arc = 0, rad = 0;
+	struct Point *points;
 
-	/* Get coords semicircle */
-	if (init == 0) {
-		init = 1;
-		printf("Creating semicircle\n");
-		arc = 180.0f / NPOINTS; /* Size of the arc between points */
-		points = (struct Point*) malloc(NPOINTS * sizeof(struct Point));
-		for (i = 0; i < NPOINTS; i++) {
-			pos = i * arc;
-			radians = ((float) pos) * 3.14159/180;
-			points[i].x = cos(radians) * radius;
-			points[i].y = sin(radians) * radius;
-			points[i].color.r = 1;
-			points[i].color.g = 1;
-			points[i].color.b = 1;
-		}
-	
+	printf("Creating semicircle\n");
+
+	points = (struct Point*) malloc(npoints * sizeof(struct Point));
+
+	if (points == NULL) {
+		/* Cannot allocate memory */
+		return points;
 	}
 
+	/* Size of the arc between points */
+	arc = 180.0f / npoints;
+
+	for (i = 0; i < npoints; i++) {
+		pos = i * arc;
+		/* From pos in degrees to radians */
+		rad = ((float) pos) * 3.14159/180;
+		points[i].x = cos(rad) * radius;
+		points[i].y = sin(rad) * radius;
+		/* Set color to white */
+		points[i].color.r = 1;
+		points[i].color.g = 1;
+		points[i].color.b = 1;
+	}
+
+	return points;
+}
+
+static void
+destroySemicircle(struct Point* points)
+{
+	if (points != NULL) {
+		free(points);
+	}
+}
+
+static int
+drawScene(struct Point* points)
+{
+	int i = 0;
+	static float spin = 0;
 	
 	/* Clear The Screen And The Depth Buffer */
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	/* Move Left 1.5 Units And Into The Screen 6.0 */
+	/* Move left 1.5 units and into the screen 20.0 */
 	glLoadIdentity();
 	glTranslatef(-1.5f, 0.0f, -20.0f);
 	
@@ -157,6 +177,7 @@ loop()
 	const SDL_VideoInfo *videoInfo;
 	/* whether or not the window is active */
 	int isActive = TRUE;
+	struct Point *points;
 
 	if ( SDL_Init( SDL_INIT_VIDEO ) < 0 ) {
 		fprintf( stderr, "Video initialization failed: %s\n",
@@ -209,6 +230,13 @@ loop()
 	/* resize the initial window */
 	resizeWin(SCREEN_WIDTH, SCREEN_HEIGHT);
 
+	points = createSemicircle(NPOINTS, 5); 
+
+	if (points == NULL) {
+		fprintf(stderr, "Can't allocate memory for points.\n");
+		Quit(1);
+	}
+
 	/* wait for events */
 	while (!done) {
 		while (SDL_PollEvent(&event)) {
@@ -254,9 +282,11 @@ loop()
 		}
 
 		if (isActive) {
-			drawGLScene();
+			drawScene(points);
 		}
 	}
+
+	destroySemicircle(points);
 
 	return 0;
 }
