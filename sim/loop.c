@@ -2,7 +2,8 @@
  * Lightstar simulator
  */
  
-#include "defines.h"
+#include "loop.h"
+#include "settings.h"
 
 /* This is our SDL surface */
 SDL_Surface *surface;

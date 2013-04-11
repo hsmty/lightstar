@@ -1,16 +1,9 @@
-/* simul.c (c) 2013 R. Díaz de León P.
+/* settings.h (c) 2013 R. Díaz de León P.
  * Lightstar simulator
  */
  
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h> 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <SDL/SDL.h>
-
-#include "loop.h"
-
+#ifndef _SETTINGS_
+#define _SETTINGS_
 /* screen width, height, and bit depth */
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT 480
@@ -22,3 +15,5 @@
 
 /* Number of points in the circumference */
 #define NPOINTS 86
+
+#endif

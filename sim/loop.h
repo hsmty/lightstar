@@ -1,7 +1,14 @@
 /* loop.h (c) 2013 R. Díaz de León P.
  * Lightstar simulator
  */
- 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h> 
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <SDL/SDL.h>
+
 struct Color {
 	float r;
 	float g;

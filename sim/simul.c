@@ -2,7 +2,8 @@
  * Lightstar simulator
  */
  
-#include "defines.h"
+#include "loop.h"
+#include "settings.h"
 
 int
 main( int argc, char **argv )
