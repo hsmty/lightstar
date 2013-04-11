@@ -1,7 +1,14 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
-GLLIBS = -lGL -lGLU -lglut
-SDLLIB = -lSDL
+
+OS := $(shell uname)
+ifeq ($(OS), Darwin)
+	CFLAGS += -framework OpenGL -framework GLUT -I/opt/local/include/SDL/
+	SDLLIB = `sdl-config --libs`
+else
+	GLLIBS = -lGL -lGLU -lglut
+	SDLLIB = -lSDL
+endif
 
 all: simul
 
