@@ -1,43 +1,11 @@
-/* simul.c (c) 2013 R. Díaz de León P.
+/* loop.c (c) 2013 R. Díaz de León P.
  * Lightstar simulator
  */
  
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h> 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <SDL/SDL.h>
-
-/* screen width, height, and bit depth */
-#define SCREEN_WIDTH  640
-#define SCREEN_HEIGHT 480
-#define SCREEN_BPP     16
-
-/* Define our booleans */
-#define TRUE  1
-#define FALSE 0
-
-/* Number of points in the circumference */
-#define NPOINTS 86
+#include "defines.h"
 
 /* This is our SDL surface */
 SDL_Surface *surface;
-
-struct Color {
-	float r;
-	float g;
-	float b;
-};
-
-struct Point {
-	float x;
-	float y;
-	struct Color *color;
-};
-
-void Quit(int ret);
-int resizeWin(int width, int height);
 
 void
 Quit(int ret)
@@ -141,8 +109,8 @@ drawGLScene( GLvoid )
 			points[i].y = sin(radians) * radius;
 			points[i].color = (struct Color*) malloc(sizeof(struct Color));
 			points[i].color->r = 1;
-			points[i].color->g = 0;
-			points[i].color->b = 0;
+			points[i].color->g = 1;
+			points[i].color->b = 1;
 		}
 	
 	}
@@ -177,7 +145,7 @@ drawGLScene( GLvoid )
 }
 
 int
-main( int argc, char **argv )
+loop()
 {
 	/* Flags to pass to SDL_SetVideoMode */
 	int videoFlags;
@@ -290,9 +258,5 @@ main( int argc, char **argv )
 		}
 	}
 
-	/* clean ourselves up and exit */
-	Quit(0);
-
-	/* Should never get here */
 	return 0;
 }

@@ -8,5 +8,5 @@ all: simul
 clean:
 	rm simul
 
-simul: simul.c
-	$(CC) $(CFLAGS) -o simul simul.c $(GLLIBS) $(SDLLIB)
+simul: sim/simul.c sim/loop.c
+	$(CC) $(CFLAGS) -o simul sim/simul.c sim/loop.c $(GLLIBS) $(SDLLIB)
