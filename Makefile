@@ -1,7 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Werror -g
 Objects = simul
-SDLLIB := $(shell sdl-config --libs --cflags)
 
 OS := $(shell uname)
 ifeq ($(OS), Darwin)
