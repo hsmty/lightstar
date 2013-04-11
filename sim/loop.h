@@ -22,7 +22,7 @@ struct Color {
 struct Point {
 	float x;
 	float y;
-	struct Color *color;
+	struct Color color;
 };
 
 extern void Quit(int ret);

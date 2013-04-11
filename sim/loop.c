@@ -108,10 +108,9 @@ drawGLScene( GLvoid )
 			radians = ((float) pos) * 3.14159/180;
 			points[i].x = cos(radians) * radius;
 			points[i].y = sin(radians) * radius;
-			points[i].color = (struct Color*) malloc(sizeof(struct Color));
-			points[i].color->r = 1;
-			points[i].color->g = 1;
-			points[i].color->b = 1;
+			points[i].color.r = 1;
+			points[i].color.g = 1;
+			points[i].color.b = 1;
 		}
 	
 	}
@@ -133,7 +132,7 @@ drawGLScene( GLvoid )
 		/* Drawing Using Triangles */
 		struct Point p = points[i];
 		glBegin( GL_POINTS );
-		glColor3f(p.color->r,  p.color->g,  p.color->b );
+		glColor3f(p.color.r,  p.color.g,  p.color.b );
 		glVertex3f(p.y, p.x,  0.0f); /* Top Of Triangle */
 		/* Finished Drawing The Triangle */
 		glEnd();
