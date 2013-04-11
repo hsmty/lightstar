@@ -19,7 +19,7 @@
 #define FALSE 0
 
 /* Number of points in the circumference */
-#define NPOINTS 100
+#define NPOINTS 86
 
 /* This is our SDL surface */
 SDL_Surface *surface;
@@ -119,19 +119,21 @@ drawGLScene( GLvoid )
 	int radius = 5, i = 0;
 	static int init = 0;
 	static struct Point *points;
-	static float spin = 0;
+	static float spin = 0, arc = 0;
 
 	/* Get coords semicircle */
 	if (init == 0) {
 		init = 1;
 		printf("Creating semicircle\n");
+		arc = 180.0f / NPOINTS; /* Size of the arc between points */
 		points = (struct Point*) malloc(NPOINTS * sizeof(struct Point));
 		for (i = 0; i < NPOINTS; i++) {
-			pos = i * 18;
+			pos = i * arc;
 			radians = ((float) pos) * 3.14159/180;
 			points[i].x = cos(radians) * radius;
 			points[i].y = sin(radians) * radius;
 		}
+	
 	}
 
 	
@@ -143,9 +145,9 @@ drawGLScene( GLvoid )
 	glTranslatef(-1.5f, 0.0f, -20.0f);
 	
 	/* Starts to spin */ 
-	spin += 90.0f;
+	spin += 15.0f;
 	glRotatef(spin, 0.0f, 1.0f, 0.0f);
-	
+
 	glPointSize(3.0f);
 	for (i = 0; i < 100; i++) {	
 		/* Drawing Using Triangles */
