@@ -128,7 +128,7 @@ drawGLScene( GLvoid )
 		arc = 180.0f / NPOINTS; /* Size of the arc between points */
 		points = (struct Point*) malloc(NPOINTS * sizeof(struct Point));
 		for (i = 0; i < NPOINTS; i++) {
-			pos = i * arc;
+			pos = (i + 1) * arc;
 			radians = ((float) pos) * 3.14159/180;
 			points[i].x = cos(radians) * radius;
 			points[i].y = sin(radians) * radius;
@@ -149,7 +149,7 @@ drawGLScene( GLvoid )
 	glRotatef(spin, 0.0f, 1.0f, 0.0f);
 
 	glPointSize(3.0f);
-	for (i = 0; i < 100; i++) {	
+	for (i = 0; i < NPOINTS; i++) {	
 		/* Drawing Using Triangles */
 		glBegin( GL_POINTS );
 		if (i % 2) {
@@ -215,15 +215,14 @@ main( int argc, char **argv )
 		videoFlags |= SDL_HWACCEL;
 
 	/* Sets up OpenGL double buffering */
-	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	/* get a SDL surface */
 	surface = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP,
 			videoFlags );
 
 	/* Verify there is a surface */
-	if ( !surface )
-	{
+	if (!surface) {
 		fprintf(stderr,  "Video mode set failed: %s\n", SDL_GetError());
 		Quit(1);
 	}
@@ -236,50 +235,51 @@ main( int argc, char **argv )
 
 	/* wait for events */
 	while (!done) {
-
 		while (SDL_PollEvent(&event)) {
 			switch (event.type) {
-				case SDL_ACTIVEEVENT:
-					/* Something's happend with our focus
-					 * If we lost focus or we are iconified,
-					 * we shouldn't draw the screen
-					 */
-					if (event.active.gain == 0)
-						isActive = FALSE;
-					else
-						isActive = TRUE;
-					break;			    
-				case SDL_VIDEORESIZE:
-					/* handle resize event */
-					surface = SDL_SetVideoMode(
-							event.resize.w,
-							event.resize.h,
-							16, videoFlags );
-					if (!surface) {
-						fprintf(stderr, 
+			case SDL_ACTIVEEVENT:
+				/* Something's happend with our focus
+				 * If we lost focus or we are iconified,
+				 * we shouldn't draw the screen
+				 */
+				if (event.active.gain == 0)
+					isActive = FALSE;
+				else
+					isActive = TRUE;
+				break;			    
+			case SDL_VIDEORESIZE:
+				/* handle resize event */
+				surface = SDL_SetVideoMode(
+						event.resize.w,
+						event.resize.h,
+						16, videoFlags );
+				if (!surface) {
+					fprintf(stderr, 
 							"Could not get a "
 							"surface after resize: %s\n", 
 							SDL_GetError( ) );
-						Quit(1);
-					}
-					resizeWin( 
+					Quit(1);
+				}
+				resizeWin( 
 						event.resize.w, 
 						event.resize.h );
-					break;
-				case SDL_KEYDOWN:
-					/* handle key presses */
-					handleKeyPress( &event.key.keysym );
-					break;
-				case SDL_QUIT:
-					/* handle quit requests */
-					done = TRUE;
-					break;
-				default:
-					break;
+				break;
+			case SDL_KEYDOWN:
+				/* handle key presses */
+				handleKeyPress( &event.key.keysym );
+				break;
+			case SDL_QUIT:
+				/* handle quit requests */
+				done = TRUE;
+				break;
+			default:
+				break;
 			}
 		}
 
-		if (isActive) drawGLScene();
+		if (isActive) {
+		  drawGLScene();
+		}
 	}
 
 	/* clean ourselves up and exit */
