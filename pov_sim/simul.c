@@ -156,7 +156,7 @@ drawGLScene( GLvoid )
 	glTranslatef(-1.5f, 0.0f, -20.0f);
 	
 	/* Starts to spin */ 
-	spin += 15.0f;
+	spin += 2.0f;
 	glRotatef(spin, 0.0f, 1.0f, 0.0f);
 
 	glPointSize(3.0f);
