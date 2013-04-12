@@ -31,8 +31,8 @@ resizeWindow(int width, int height)
 static struct Point*
 createSemicircle(const int npoints, const int radius)
 {
-	int i, pos = 0;
-	float arc = 0, rad = 0;
+	int i;
+	float arc = 0, rad = 0, pos = 0;
 	struct Point *points;
 
 	printf("Creating semicircle\n");
@@ -101,6 +101,16 @@ drawScene()
  	glutSwapBuffers();
 }
 
+static void
+keydown(unsigned char key, int x, int y)
+{
+	switch (key) {
+		case 'q':
+			exit(0);
+			break;
+	}
+}
+
 void
 loop()
 {
@@ -110,6 +120,7 @@ loop()
 	glutCreateWindow("Lightstar The Movie The Game X Turbo POV Simulation");
 	glutReshapeFunc(resizeWindow);
 	glutDisplayFunc(drawScene);	
+	glutKeyboardFunc(keydown);
 	glutIdleFunc(glutPostRedisplay);
 	glEnable(GL_DEPTH_TEST);
 
