@@ -11,34 +11,28 @@ static struct Point *points;
 void 
 resizeWindow(int width, int height)
 {
-    GLfloat ratio;
+	GLfloat ratio;
 
-    if (height == 0){
-	height = 1;
-    }
+	/* Avoid division by zero */
+	if (height == 0){
+		height = 1;
+	}
 
-    ratio = (GLfloat) width / (GLfloat) height;
-
-    glViewport(0, 0, (GLsizei) width, (GLsizei) height);
-
-    glMatrixMode(GL_PROJECTION);
-    
+	ratio = (GLfloat) width / (GLfloat) height;
+	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
-    gluPerspective(45.0f, ratio, 0.1f, 100.0f);
-
-    glMatrixMode(GL_MODELVIEW);
-
-    glLoadIdentity();
-
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
 /* Here goes our drawing code */
 static struct Point*
-createSemicircle(const int npoints, const int radius)
+createSemicircle(const int npoints)
 {
-	int i, pos = 0;
-	float arc = 0, rad = 0;
+	int i, initial_x = 0, initial_y = 5;
+	float arc = 0, tetha_rad = 0, tetha_deg = 0;
 	struct Point *points;
 
 	printf("Creating semicircle\n");
@@ -54,17 +48,17 @@ createSemicircle(const int npoints, const int radius)
 	arc = 180.0f / npoints;
 
 	for (i = 0; i < npoints; i++) {
-		pos = i * arc;
+	 	tetha_deg = (i * arc);
 		/* From pos in degrees to radians */
-		rad = ((float) pos) * 3.14159/180;
-		points[i].x = cos(rad) * radius;
-		points[i].y = sin(rad) * radius;
+		tetha_rad = tetha_deg * 3.14159/180;
+		points[i].x = (initial_x * cos(tetha_rad)) - (initial_y * sin(tetha_rad));
+		points[i].y = (initial_x * sin(tetha_rad)) + (initial_y * cos(tetha_rad));
 		/* Set color to white */
 		points[i].color.r = 1;
 		points[i].color.g = 1;
 		points[i].color.b = 1;
 	}
-
+	
 	return points;
 }
 
@@ -80,7 +74,6 @@ static void
 drawScene()
 {
 	int i = 0;
-	static float spin = 0;
 	
 	/* Clear The Screen And The Depth Buffer */
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -90,16 +83,12 @@ drawScene()
 
 	glTranslatef(0.0f, 0.0f, -20.0f);
 	
-	spin += 2.0f;
-	glRotatef(spin, 0.0f, 1.0f, 0.0f);
-
 	glPointSize(3.0f);
 	for (i = 0; i < NPOINTS; i++) {	
 		struct Point p = points[i];
 		glBegin( GL_POINTS );
 		glColor3f(p.color.r,  p.color.g,  p.color.b );
-		glVertex3f(p.y, p.x,  0.0f); /* Top Of Triangle */
-		/* Finished Drawing The Triangle */
+		glVertex3f(p.x, p.y,  0.0f);
 		glEnd();
 	}
 
@@ -107,19 +96,31 @@ drawScene()
  	glutSwapBuffers();
 }
 
+static void
+keydown(unsigned char key, int x, int y)
+{
+	switch (key) {
+		case 'q':
+			exit(0);
+			break;
+	}
+}
+
 void
 loop()
 {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	glutCreateWindow("Lightstar The Movie The Game X Turbo POV Simulation");
 	glutReshapeFunc(resizeWindow);
 	glutDisplayFunc(drawScene);	
+	glutKeyboardFunc(keydown);
 	glutIdleFunc(glutPostRedisplay);
 	glEnable(GL_DEPTH_TEST);
 
 	/* points is static to the file */
-	points = createSemicircle(NPOINTS, 5);
+	points = createSemicircle(NPOINTS);
 	glutMainLoop();
 	destroySemicircle(points);
 }
