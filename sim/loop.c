@@ -66,9 +66,9 @@ createSemicircle(const int npoints_h, const int npoints_v)
 			points[i][j].y = temp_y; 
 			points[i][j].z = temp_x * sin(tetha);			
 			/* Set color to white */
-			points[i][j].color.r = 1;
-			points[i][j].color.g = 1;
-			points[i][j].color.b = 1;
+			points[i][j].color.r = 0;
+			points[i][j].color.g = 0;
+			points[i][j].color.b = 0;
 		}
 		
 	}
@@ -90,9 +90,8 @@ destroySemicircle(struct Point** points, const int npoints_h)
 static void
 drawScene()
 {
-	int i = 0;
+	int i = 0, j = 0;
 	static int spin = 0;
-
 
 	/* Clear The Screen And The Depth Buffer */
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -101,21 +100,39 @@ drawScene()
 	glLoadIdentity();
 
 	glTranslatef(0.0f, 0.0f, -20.0f);
-
-	spin++;
-	if(spin >= NPOINTS_H){
-		spin = 0;
-	}	
 	
-	glPointSize(3.0f);
-	for (i = 0; i < NPOINTS_V; i++) {	
-		struct Point p = points[spin][i];
-		glBegin( GL_POINTS );
-		glColor3f(p.color.r, p.color.g, p.color.b);
-		glVertex3f(p.x, p.y, p.z);
-		glEnd();
-	}
+    if(spin >= NPOINTS_H){
+        spin = 0;
+    }
 
+    for (i = 0; i < NPOINTS_V; i++){
+        if (spin == 0){
+            points[NPOINTS_H - 1][i].color.r = 0;
+            points[NPOINTS_H - 1][i].color.g = 0;
+            points[NPOINTS_H - 1][i].color.b = 0;
+        }else{
+            points[spin - 1][i].color.r = 0;
+            points[spin - 1][i].color.g = 0;
+            points[spin - 1][i].color.b = 0;
+        }
+        points[spin][i].color.r = 255;
+        points[spin][i].color.g = 255;
+        points[spin][i].color.b = 255;
+    }
+
+    glPointSize(3.0f);
+    for (i = 0; i < NPOINTS_H; i++) {
+        for (j = 0; j < NPOINTS_V; j++) {
+            struct Point p = points[i][j];
+            glBegin( GL_POINTS );
+            glColor3f(p.color.r, p.color.g, p.color.b);
+            glVertex3f(p.x, p.y, p.z);
+            glEnd();
+        }
+    }
+
+    spin++;
+	
 	glFlush();
  	glutSwapBuffers();
 }
