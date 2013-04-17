@@ -27,6 +27,7 @@ struct Color {
 struct Point {
 	float x;
 	float y;
+	float z;
 	struct Color color;
 };
 

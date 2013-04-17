@@ -13,6 +13,7 @@
 #define FALSE 0
 
 /* Number of points in the circumference */
-#define NPOINTS 86
+#define NPOINTS_H 180
+#define NPOINTS_V 86
 
 #endif
