@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> 
+#include <string.h>
+#include <X11/xpm.h>
 
 #ifdef __APPLE__
 	#include <OpenGL/gl.h>

@@ -7,6 +7,11 @@
 
 /* Needed for draw scene */
 static struct Point** points;
+int** rgb;
+
+int** rgbArray ( char* filename );
+XpmImage* loadimage ( char* filename );
+
 
 void 
 resizeWindow(int width, int height)
@@ -33,20 +38,20 @@ createSemicircle(const int npoints_h, const int npoints_v)
 {
 	int i, j, initial_x = 0, initial_y = 5;
 	float arc = 0, arc2 = 0, rad = 0, deg = 0, tetha = 0;
-	float temp_x = 0, temp_y = 0;
-	
+	float temp_x = 0, temp_y = 0;	
+
 	printf("Creating semicircle\n");
 
 	points = (struct Point**) malloc(npoints_h * sizeof(struct Point*));
 	for (i = 0; i < npoints_h; i++){
 		 points[i] = (struct Point*) malloc(npoints_v * sizeof(struct Point));
 	} 
-		 
-
+		
 	if (points == NULL) {
 		/* Cannot allocate memory */
 		return points;
 	}
+	
 
 	/* Size of the arc between points */
 	arc = 180.0f / npoints_v;
@@ -64,14 +69,28 @@ createSemicircle(const int npoints_h, const int npoints_v)
 			/* Rotate about y axis with z=0 */
 			points[i][j].x = temp_x * cos(tetha); 
 			points[i][j].y = temp_y; 
-			points[i][j].z = temp_x * sin(tetha);			
-			/* Set color to white */
-			points[i][j].color.r = 0;
-			points[i][j].color.g = 0;
-			points[i][j].color.b = 0;
+			points[i][j].z = temp_x * sin(tetha);		
+		/*	
+			points[i][j].color.r = 255;
+        	points[i][j].color.g = 255; 
+       	 	points[i][j].color.b = 255;
+	*/
 		}
 		
 	}
+
+	/*get image RGB values*/
+	rgb = rgbArray("world.xpm"); 
+	
+	/* Set colors to RGB array */
+	for (i = 0; i < npoints_h; i++) {
+    	for (j = 0; j < npoints_v; j++){
+ 			points[i][j].color.r = rgb[i+j][0];
+        	points[i][j].color.g = rgb[i+j][1]; 
+        	points[i][j].color.b = rgb[i+j][2];
+		}
+	}
+	
 	return points;
 }
 
@@ -85,6 +104,12 @@ destroySemicircle(struct Point** points, const int npoints_h)
     	}	
 		free(points);
 	}
+		
+	for (i = 0; i < 3; i++){
+		free(rgb[i]);
+    }
+    free(rgb);
+	
 }
 
 static void
@@ -100,26 +125,9 @@ drawScene()
 	glLoadIdentity();
 
 	glTranslatef(0.0f, 0.0f, -20.0f);
+
+	glRotatef(spin, 0.0f, 1.0f, 0.0f);
 	
-    if(spin >= NPOINTS_H){
-        spin = 0;
-    }
-
-    for (i = 0; i < NPOINTS_V; i++){
-        if (spin == 0){
-            points[NPOINTS_H - 1][i].color.r = 0;
-            points[NPOINTS_H - 1][i].color.g = 0;
-            points[NPOINTS_H - 1][i].color.b = 0;
-        }else{
-            points[spin - 1][i].color.r = 0;
-            points[spin - 1][i].color.g = 0;
-            points[spin - 1][i].color.b = 0;
-        }
-        points[spin][i].color.r = 255;
-        points[spin][i].color.g = 255;
-        points[spin][i].color.b = 255;
-    }
-
     glPointSize(3.0f);
     for (i = 0; i < NPOINTS_H; i++) {
         for (j = 0; j < NPOINTS_V; j++) {
@@ -136,6 +144,8 @@ drawScene()
 	glFlush();
  	glutSwapBuffers();
 }
+
+
 
 static void
 keydown(unsigned char key, int x, int y)
@@ -164,4 +174,63 @@ loop()
 	points = createSemicircle(NPOINTS_H, NPOINTS_V);
 	glutMainLoop();
 	destroySemicircle(points, NPOINTS_H);
+}
+
+XpmImage*
+loadimage(char* filename)
+{
+    int size;
+    XpmImage* img = NULL;
+    FILE* file = fopen(filename, "r");
+
+    if (file == NULL) {
+        /* Couldn't open the image, send and empty XpmImage */
+        return img;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size = ftell(file);
+    fclose(file);
+
+    img = malloc(sizeof(XpmImage) + size);
+
+    if (XpmReadFileToXpmImage(filename, img, NULL) == XpmSuccess) {
+        return img;
+    }
+
+    return (XpmImage*) NULL;
+}
+
+int**
+rgbArray( char* filename )
+{
+    int i = 0, j = 0;
+    XpmImage* img = loadimage(filename);
+    int num_pixels = (img->width) * (img->height);
+    rgb = malloc(num_pixels*sizeof(int));
+    for (i=0;i<num_pixels; i++){
+        rgb[i] = malloc(3*sizeof(int));
+    }
+
+    for(i = 0; i < num_pixels; i++){
+        XpmColor pixel = img->colorTable[img->data[i]];
+        char* tmp = pixel.c_color;
+        tmp++;
+
+        /*Hex color code to decimal RGB*/
+        for(j = 0; j < 3; j++){
+            char hex[4] = "0x";
+            char dec[4] = "";
+            int t = 0;
+
+            strncat(hex, tmp, 2);
+            t = strtol(hex, NULL, 16);
+            sprintf(dec, "%d", t);
+            rgb[i][j]= atoi(dec);
+
+            if(j != 2) tmp+=2;
+        }
+    }
+
+    return rgb;
 }
