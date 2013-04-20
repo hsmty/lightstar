@@ -8,6 +8,7 @@
 /* Needed for draw scene */
 static struct Point** points;
 int** rgb;
+int the_flag=0;
 
 int** rgbArray ( char* filename );
 XpmImage* loadimage ( char* filename );
@@ -27,7 +28,7 @@ resizeWindow(int width, int height)
 	glViewport(0, 0, (GLsizei) width, (GLsizei) height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	gluPerspective(45.0f, ratio, 0.1f, 200.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 }
@@ -124,6 +125,7 @@ drawScene()
 	/* Move left 1.5 units and into the screen 20.0 */
 	glLoadIdentity();
 
+	if(the_flag == 0){
 	glTranslatef(0.0f, 0.0f, -20.0f);
 
 	glRotatef(spin, 0.0f, 1.0f, 0.0f);
@@ -138,6 +140,21 @@ drawScene()
             glEnd();
         }
     }
+	}else{
+	
+	glTranslatef(-1*NPOINTS_H/2, -1*NPOINTS_V/2, -180.0f);
+
+	glPointSize(3.0f);
+    for (i = 0; i < NPOINTS_H; i++) {
+        for (j = 0; j < NPOINTS_V; j++) {
+            struct Point p = points[i][j];
+            glBegin( GL_POINTS );
+            glColor3f(p.color.r, p.color.g, p.color.b);
+            glVertex3f(i, j, 0);
+            glEnd();
+        }
+    }
+	}
 
     spin++;
 	
@@ -153,6 +170,10 @@ keydown(unsigned char key, int x, int y)
 	switch (key) {
 		case 'q':
 			exit(0);
+			break;
+		case 's':
+			if(the_flag == 1){the_flag = 0;}
+			else{the_flag = 1;}
 			break;
 	}
 }
