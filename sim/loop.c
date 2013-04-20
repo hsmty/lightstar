@@ -228,32 +228,22 @@ loadimage(char* filename)
 int**
 rgbArray( char* filename )
 {
-    int i = 0, j = 0;
+    int i = 0, k;
     XpmImage* img = loadimage(filename);
     int num_pixels = (img->width) * (img->height);
-    rgb = malloc(num_pixels*sizeof(int));
-    for (i=0;i<num_pixels; i++){
-        rgb[i] = malloc(3*sizeof(int));
+    rgb = malloc(num_pixels*3*sizeof(int));
+    for (i=0;i<num_pixels; i++) {
+        rgb[i] = malloc(sizeof(int));
     }
 
-    for(i = 0; i < num_pixels; i++){
+    for(i = 0; i < num_pixels; i++) {
         XpmColor pixel = img->colorTable[img->data[i]];
         char* tmp = pixel.c_color;
         tmp++;
-
-        /*Hex color code to decimal RGB*/
-        for(j = 0; j < 3; j++){
-            char hex[4] = "0x";
-            char dec[4] = "";
-            int t = 0;
-
-            strncat(hex, tmp, 2);
-            t = strtol(hex, NULL, 16);
-            sprintf(dec, "%d", t);
-            rgb[i][j]= atoi(dec);
-
-            if(j != 2) tmp+=2;
-        }
+        sscanf(tmp, "%x", &k);
+        rgb[i][0] = k & 0xFF0000;
+        rgb[i][1] = k & 0xFF00;
+        rgb[i][2] = k & 0xFF;
     }
 
 	XpmFree(img);
