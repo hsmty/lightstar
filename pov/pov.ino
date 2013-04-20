@@ -50,7 +50,8 @@ struct sphcmd_load_ack
 };
 #pragma pack(pop)
 
-#define MAX_SIZE 65535
+
+#define MAX_SIZE 8192
 
 enum { START, TYPE, HI_LEN, LO_LEN, DATA, CKSUM };
 
@@ -61,8 +62,10 @@ void setup()
 
 void loop()
 {
+        
 	while (Serial.available())
 	{
+                Serial.println("Entering read command...");
 		readCommand();
 	}
 
@@ -70,50 +73,44 @@ void loop()
 }
 
 int sendAck(unsigned char type)
-{
+{      
 	if (type == LOAD)
 	{
-		struct sphcmd_load_ack ack;
-		ack.hdr.start = STX;
-		ack.hdr.id = LOAD & MASK;
-		ack.hdr.hi_len = 0x00;
-		ack.hdr.lo_len = 0x01;
-		ack.image_id = 0x01;
-		ack.cksum = 0x00;
-		Serial.write(&ack, sizeof(struct sphcmd_load_ack));
+		Serial.write(STX);
+                Serial.write(LOAD & MASK);
+                Serial.write(0x00);
+                Serial.write(0x01);
+                Serial.write(0x00);
+                Serial.write(0x00);
 	}
 	else if (type == SPIN)
 	{
-		struct sphcmd_ack ack;
-		ack.hdr.start = STX;
-		ack.hdr.id = SPIN & MASK;
-		ack.hdr.hi_len = 0x00;
-		ack.hdr.lo_len = 0x00;
-		ack.cksum = 0x00;
-
-		Serial.write(&ack, sizeof(struct sphcmd_ack));
+  		Serial.write(STX);
+                Serial.write(SPIN & MASK);
+                Serial.write(0x00);
+                Serial.write(0x00);
+                Serial.write(0x00);
 	}
 	else if (type == STOP)
 	{
-		struct sphcmd_ack ack;
-		ack.hdr.start = STX;
-		ack.hdr.id = STOP & MASK;
-		ack.hdr.hi_len = 0x00;
-		ack.hdr.lo_len = 0x00;
-		ack.cksum = 0x00;
-		Serial.write(&ack, sizeof(struct sphcmd_ack));
+		Serial.write(STX);
+                Serial.write(STOP & MASK);
+                Serial.write(0x00);
+                Serial.write(0x00);
+                Serial.write(0x00);
 	}
 }
 
 void processCommand(unsigned char type, unsigned char *data, unsigned int data_length)
 {
+
 	if (sendAck(type))
 		return;
 
 	/* process load (data) or spin or stop */
 }
 
-int readCommand()
+void readCommand()
 {
 	static unsigned char cmd[MAX_SIZE];
 	static unsigned char byte;
@@ -126,6 +123,11 @@ int readCommand()
 	{
 		case START:
 			cmd[i] = Serial.read();
+                        if (cmd[i] != STX)
+                        {
+                          Serial.println("Not STX");
+                          return;
+                        }
 			i = TYPE;
 		break;
 		case TYPE:
@@ -137,8 +139,14 @@ int readCommand()
 			i = LO_LEN;
 		break;
 		case LO_LEN:
+                        uint8_t hi, lo;
+                        
 			cmd[i] = Serial.read();
-			data_length = (cmd[HI_LEN] * 256) + cmd[LO_LEN];
+                        hi = cmd[HI_LEN];
+                        lo = cmd[LO_LEN];
+			data_length = ( hi * 256) + lo;
+                                Serial.print("Data length: ");
+                                Serial.println(data_length);
 			i = DATA;
 		break;
 		case DATA:
