@@ -84,12 +84,15 @@ createSemicircle(const int npoints_h, const int npoints_v)
 	rgb = rgbArray("world.xpm"); 
 	
 	/* Set colors to RGB array */
-	for (i = 0; i < npoints_h; i++) {
-    	for (j = 0; j < npoints_v; j++){
- 			points[i][j].color.r = rgb[i+j][0];
-        	points[i][j].color.g = rgb[i+j][1]; 
-        	points[i][j].color.b = rgb[i+j][2];
-		}
+	j=0;
+	int newline=0, k=0;
+	for (i = 0; i < 180 * 86; i++) {
+		if(newline==1  && (j<86)){j++; newline=0; k=0;}
+		points[k][j].color.r = rgb[i][0];
+        points[k][j].color.g = rgb[i][1]; 
+        points[k][j].color.b = rgb[i][2];
+		k++;
+ 		if((i%180 == 0)){newline=1;}
 	}
 	
 	return points;
@@ -142,7 +145,7 @@ drawScene()
     }
 	}else{
 	
-	glTranslatef(-1*NPOINTS_H/2, -1*NPOINTS_V/2, -180.0f);
+	glTranslatef(-1*NPOINTS_H/2, NPOINTS_V/2, -180.0f);
 
 	glPointSize(3.0f);
     for (i = 0; i < NPOINTS_H; i++) {
@@ -150,7 +153,7 @@ drawScene()
             struct Point p = points[i][j];
             glBegin( GL_POINTS );
             glColor3f(p.color.r, p.color.g, p.color.b);
-            glVertex3f(i, j, 0);
+            glVertex3f(i, (-1)*j, 0);
             glEnd();
         }
     }
@@ -252,6 +255,8 @@ rgbArray( char* filename )
             if(j != 2) tmp+=2;
         }
     }
+
+	XpmFree(img);
 
     return rgb;
 }
