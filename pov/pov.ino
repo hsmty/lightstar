@@ -6,6 +6,21 @@
 
 #define MASK		0x80
 
+#include <OctoWS2811.h>
+/* LED config */
+#define HEIGHT 86
+#define WIDTH  180
+#define STRIPS 2
+#define PAUSE 100
+
+DMAMEM int displayMemory[HEIGHT * 6];
+int drawingMemory[HEIGHT * 6];
+
+// Our Strip
+const int config =  WS2811_GRB | WS2811_800kHz ;
+
+OctoWS2811 leds(HEIGHT, displayMemory, drawingMemory, config);
+
 #pragma pack(push)
 #pragma pack(1)
 struct sphcmd_header
@@ -57,18 +72,32 @@ enum { START, TYPE, HI_LEN, LO_LEN, DATA, CKSUM };
 
 void setup()
 {
-	 Serial.begin(9600);
+	/* 9600 is the baud rate for USB */
+	Serial.begin(9600);
+	leds.begin();
+	leds.show();
 }
 
 void loop()
 {
-        
 	while (Serial.available())
 	{
+              
                 Serial.println("Entering read command...");
 		readCommand();
 	}
-
+       	int i = 0, j = 0;
+	int img[WIDTH][HEIGHT] = {0xFF0087};
+        img[0][0] = 0x0000FF;
+	/* width is the resolution for one turn */
+	for (i = 0; i < WIDTH; i++) 
+	{
+		for (j = 0; j < HEIGHT; j++) 
+		{
+              	  leds.setPixel(j, img[i][j]);
+             	}
+		leds.show();
+	}
 	/* do other stuff */
 }
 
@@ -170,4 +199,9 @@ void readCommand()
 		default: /* Never reached */
 			break;
 	}
+}
+
+void showImage()
+{
+
 }
