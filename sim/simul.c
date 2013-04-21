@@ -9,6 +9,6 @@ int
 main( int argc, char **argv )
 {
 	glutInit(&argc, argv);
-	loop();
+	loop(argv[1]);
 	return 0;
 }

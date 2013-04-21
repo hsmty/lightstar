@@ -33,6 +33,6 @@ struct Point {
 	struct Color color;
 };
 
-void loop();
+void loop(char*);
 
 #endif
