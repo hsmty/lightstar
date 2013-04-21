@@ -138,7 +138,7 @@ drawScene()
         for (j = 0; j < NPOINTS_V; j++) {
             struct Point p = points[i][j];
             glBegin( GL_POINTS );
-            glColor3f(p.color.r, p.color.g, p.color.b);
+            glColor3f(p.color.r / 255.0f, p.color.g / 255.0f, p.color.b / 255.0f);
             glVertex3f(p.x, p.y, p.z);
             glEnd();
         }
@@ -231,9 +231,9 @@ rgbArray( char* filename )
     int i = 0, k;
     XpmImage* img = loadimage(filename);
     int num_pixels = (img->width) * (img->height);
-    rgb = malloc(num_pixels*3*sizeof(int));
+    rgb = malloc(num_pixels*sizeof(int));
     for (i=0;i<num_pixels; i++) {
-        rgb[i] = malloc(sizeof(int));
+        rgb[i] = malloc(3*sizeof(int));
     }
 
     for(i = 0; i < num_pixels; i++) {
@@ -241,9 +241,9 @@ rgbArray( char* filename )
         char* tmp = pixel.c_color;
         tmp++;
         sscanf(tmp, "%x", &k);
-        rgb[i][0] = k & 0xFF0000;
-        rgb[i][1] = k & 0xFF00;
-        rgb[i][2] = k & 0xFF;
+        rgb[i][0] = ((k & 0xFF0000) >> 16);
+        rgb[i][1] = ((k & 0xFF00) >> 8);
+        rgb[i][2] = (k & 0xFF);
     }
 
 	XpmFree(img);
