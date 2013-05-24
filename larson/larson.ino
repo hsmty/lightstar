@@ -9,7 +9,7 @@
 #define DURATION 750 //time to make a full scan
 #define STRIPLENGTH  9
 #define SPREAD  2 //the "fade"
-int colorTable[3] = {0xff0000, 0x110000,0x030000}; 
+int colorTable[3] = {0xff0000, 0xff0000,0x030000}; 
 
 /* The color table has the values for the scanner colors. the 0 position
 is for the "main" pixel and it is required. If you have a "spread" value, add
